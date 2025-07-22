@@ -6,6 +6,17 @@ import json
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 
+def createChart(df, column, title, filename, color='tomato'):
+    plt.figure(figsize=(10,6))
+    plt.bar(df['country'], df[column], color=color)
+    plt.title(title)
+    plt.xlabel("Country")
+    plt.ylabel(column.replace("_", " ").title())
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(f"visuals/{filename}.png")
+    plt.close()
+
 #Parsing Url
 url = "https://disease.sh/v3/covid-19/countries"
 response = requests.get(url)
@@ -37,3 +48,12 @@ print("Top 3 Least Affected Countries:\n", leastAffected[['country', 'cases']].h
 print("Top 3 Countries with Highest Death Rate:\n", highestDeathRate[['country', 'death_rate']].head(3).to_string(index=False))
 print("Top 3 Countries with Lowest Death Rate:\n", lowestDeathRate[['country', 'death_rate']].head(3).to_string(index=False))
 print("Top 3 Countries with Most Active Cases:\n", mostActiveCases[['country', 'active']].head(3).to_string(index=False))
+
+df.to_excel("covid_report.xlsx", index=False)  #saving to Excel
+
+#Creating Visuals
+createChart(mostAffected, 'cases', 'Top 10 Most Affected Countries by COVID-19 Cases', 'most_affected_cases')
+createChart(leastAffected, 'cases', 'Top 10 Least Affected Countries by COVID-19 Cases', 'least_affected_cases', color='lightblue')
+createChart(highestDeathRate, 'death_rate', 'Top 10 Countries with Highest Death Rate', 'highest_death_rate', color='red')
+createChart(lowestDeathRate, 'death_rate', 'Top 10 Countries with Lowest Death Rate', 'lowest_death_rate', color='green')
+createChart(mostActiveCases, 'active', 'Top 10 Countries with Most Active Cases', 'most_active_cases', color='orange')
