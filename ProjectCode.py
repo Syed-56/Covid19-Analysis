@@ -18,3 +18,9 @@ df = pd.json_normalize(data)
 df = df[['country', 'cases', 'deaths', 'recovered', 'active', 'tests', 'population']]
 df.dropna(inplace=True)
 print(df.head())
+
+#Analyzing healthcare data
+df['death_rate'] = (df['deaths'] / df['cases']).round(4) * 100
+df['recovery_rate'] = (df['recovered'] / df['cases']).round(4) * 100
+df['tests-per-case'] = (df['tests'] / df['cases']).round(2)
+print(df[['country', 'death_rate', 'recovery_rate', 'tests-per-case']].head())
