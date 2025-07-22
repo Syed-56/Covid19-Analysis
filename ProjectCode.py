@@ -13,7 +13,8 @@ data = response.json()
 with open('Covid-Data.json', 'w') as f:
     json.dump(data, f, indent=4)
 
-#Creating DataFrame
-# print(data)   Unformatted JSON data
+#Creating DataFrame and storin useful data only
 df = pd.json_normalize(data)
+df = df[['country', 'cases', 'deaths', 'recovered', 'active', 'tests', 'population']]
+df.dropna(inplace=True)
 print(df.head())
