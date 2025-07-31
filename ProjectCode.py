@@ -5,6 +5,8 @@ import requests
 import json
 from openpyxl.drawing.image import Image
 from tabulate import tabulate
+from openpyxl import load_workbook
+
 
 def createChart(df, column, title, filename, color='skyblue'):
     plt.figure(figsize=(10, 8))
@@ -20,7 +22,7 @@ def createChart(df, column, title, filename, color='skyblue'):
 
     plt.subplots_adjust(left=0.1, right=0.95, top=0.88, bottom=0.15)
     plt.subplots_adjust(right=1.20)
-    plt.show()
+    plt.savefig(f"visuals/{filename}.png", bbox_inches='tight') 
     plt.close()
 
 #Parsing Url
@@ -66,7 +68,26 @@ print(tabulate(lowestDeathRate[['country', 'death_rate']].head(3), headers='keys
 print("\nTop 3 Countries with Most Active Cases:")
 print(tabulate(mostActiveCases[['country', 'active']].head(3), headers='keys', tablefmt='pretty'))
 
-df.to_excel("covid_report.xlsx", index=False)  #saving to Excel
+# Save DataFrame to Excel
+df.to_excel("covid_report.xlsx", index=False)
+
+# Auto-adjust column widths
+wb = load_workbook("covid_report.xlsx")
+ws = wb.active
+
+for col in ws.columns:
+    max_length = 0
+    col_letter = col[0].column_letter
+    for cell in col:
+        try:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+        except:
+            pass
+    adjusted_width = max_length + 2
+    ws.column_dimensions[col_letter].width = adjusted_width
+
+wb.save("covid_report.xlsx")
 
 #Creating Visuals
 createChart(mostAffected, 'cases', 'Top 10 Most Affected Countries by COVID-19 Cases', 'most_affected_cases')
